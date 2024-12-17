@@ -1,1 +1,146 @@
+Here are the essential **Google Cloud Platform (GCP)** commands using the `gcloud` CLI to perform the following tasks:
 
+---
+
+## **1. Connect to a GCP Server (VM Instance)**  
+To SSH into a VM instance:  
+
+```bash
+gcloud compute ssh <instance-name> --zone=<zone>
+```
+
+- Replace `<instance-name>` with the name of your instance.  
+- Replace `<zone>` with the instance's zone (e.g., `us-central1-a`).  
+
+Example:  
+```bash
+gcloud compute ssh my-instance --zone=us-central1-a
+```
+
+---
+
+## **2. Upload Files from Server to Local**  
+To copy files **from GCP VM to your local machine** using `scp`:
+
+```bash
+gcloud compute scp <instance-name>:<remote-file-path> <local-destination> --zone=<zone>
+```
+
+Example:  
+```bash
+gcloud compute scp my-instance:/home/ubuntu/data.txt ./data.txt --zone=us-central1-a
+```
+
+- Replace `<instance-name>` with the VM instance name.  
+- Replace `<remote-file-path>` with the file path on the VM.  
+- Replace `<local-destination>` with the path on your local machine.
+
+---
+
+## **3. Upload Files from Server to GCS (Google Cloud Storage Bucket)**  
+
+### a) **Upload to GCS Bucket from Server**
+To upload files from your GCP VM instance to a GCS bucket:
+
+```bash
+gsutil cp <file-path> gs://<bucket-name>/
+```
+
+Example:  
+```bash
+gsutil cp /home/ubuntu/data.txt gs://my-gcs-bucket/
+```
+
+- Replace `<file-path>` with the path to the file on the server.  
+- Replace `<bucket-name>` with the name of your GCS bucket.
+
+### b) **Copy Directory to GCS Bucket**  
+To upload a folder to the bucket (including all files):  
+
+```bash
+gsutil cp -r <folder-path> gs://<bucket-name>/
+```
+
+Example:  
+```bash
+gsutil cp -r /home/ubuntu/my-folder gs://my-gcs-bucket/
+```
+
+---
+
+## **4. Start or Stop a GCP VM Instance**
+
+### a) Start a VM Instance  
+To start a VM instance:
+
+```bash
+gcloud compute instances start <instance-name> --zone=<zone>
+```
+
+Example:  
+```bash
+gcloud compute instances start my-instance --zone=us-central1-a
+```
+
+### b) Stop a VM Instance  
+To stop a VM instance:
+
+```bash
+gcloud compute instances stop <instance-name> --zone=<zone>
+```
+
+Example:  
+```bash
+gcloud compute instances stop my-instance --zone=us-central1-a
+```
+
+---
+
+## **5. Destroy (Delete) a GCP VM Instance**  
+To delete a VM instance:
+
+```bash
+gcloud compute instances delete <instance-name> --zone=<zone>
+```
+
+Example:  
+```bash
+gcloud compute instances delete my-instance --zone=us-central1-a
+```
+
+- **Note**: This action is irreversible and permanently deletes the VM.
+
+---
+
+## **6. List Instances**  
+To view all instances in your project:
+
+```bash
+gcloud compute instances list
+```
+
+---
+
+## **Summary of Commands**
+
+| **Action**                    | **Command**                                                                                 |
+|-------------------------------|---------------------------------------------------------------------------------------------|
+| Connect to Server             | `gcloud compute ssh <instance-name> --zone=<zone>`                                          |
+| Upload File Server → Local    | `gcloud compute scp <instance-name>:<remote-file> <local-destination> --zone=<zone>`        |
+| Upload File Server → Bucket   | `gsutil cp <file-path> gs://<bucket-name>/`                                                 |
+| Start Instance                | `gcloud compute instances start <instance-name> --zone=<zone>`                             |
+| Stop Instance                 | `gcloud compute instances stop <instance-name> --zone=<zone>`                              |
+| Destroy Instance              | `gcloud compute instances delete <instance-name> --zone=<zone>`                            |
+| List Instances                | `gcloud compute instances list`                                                            |
+
+---
+
+### **Prerequisites**
+1. Ensure **`gcloud` CLI** is installed and configured:
+   ```bash
+   gcloud auth login
+   gcloud config set project <your-project-id>
+   ```
+2. For GCS operations, install `gsutil` (part of the Google SDK).
+
+Now you can efficiently manage your instances and file transfers in GCP! 🚀
