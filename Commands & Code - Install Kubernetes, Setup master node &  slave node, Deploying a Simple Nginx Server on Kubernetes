@@ -1,1 +1,40 @@
 
+# install kubeadm kubelet kubectl
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
+
+#install cri-dockerd
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.2.0/cri-dockerd-v0.2.0-linux-amd64.tar.gz
+tar xvf cri-dockerd-v0.2.0-linux-amd64.tar.gz
+sudo mv ./cri-dockerd /usr/local/bin/ 
+cri-dockerd --help
+wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
+wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
+install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd
+install packaging/systemd/* /etc/systemd/system
+sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+systemctl daemon-reload
+systemctl enable --now cri-docker.socket
+
+# error
+#https://github.com/kubernetes-sigs/cri-tools/blob/master/docs/crictl.md----link
+# sudo vim  /etc/crictl.yaml
+# $ cat /etc/crictl.yaml
+# runtime-endpoint: unix:///run/containerd/containerd.sock
+# image-endpoint: unix:///run/containerd/containerd.sock
+# timeout: 2
+# debug: true
+# pull-image-on-create: false
+# crictl info
+
+#on master node
+kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=unix:///var/run/containerd/containerd.sock
+#---you will get join code here, place it on workner node
+#kubeadm join 172.31.17.43:6443 --token 97mfmf.xbwihtdhwz5m05fc         --discovery-token-ca-cert-hash sha256:b23b8c1631bbfa12aa7b44647b553589458ef7ed4c6c033e5a4ac41d751ba147 --cri-socket "unix:///var/run/containerd/containerd.sock" 
+
